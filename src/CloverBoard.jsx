@@ -4,18 +4,24 @@ import { db } from './firebase';
 import ExcelExport from './ExcelExport';
 
 const SECTIONS = [
-  { id:'be',         label:'Be',         icon:'🌱', sub:'あり方・能力',
-    ph:'例）引き寄せ能力\nグランドセルフ\n愛される人格...' },
-  { id:'contribute', label:'Contribute', icon:'🌟', sub:'貢献・社会へ',
-    ph:'例）ボランティア\n愛情コーチング\nパートナーシップコーチ...' },
-  { id:'haveget',    label:'Have / Get', icon:'💎', sub:'持つ・得る',
-    ph:'例）中国語\nコミュニケーション能力\n女性性/男性性...' },
-  { id:'doenjoy',    label:'Do / Enjoy', icon:'🎯', sub:'行動・楽しむ',
-    ph:'例）ホリスティック学習\n子どもと楽しむ\n旅行...' },
-  { id:'resource',   label:'Resource',   icon:'🔑', sub:'資源・源泉',
-    ph:'例）YOLO 一度きりの人生\nやりたい事がある\n仲間...' },
-  { id:'experience', label:'Experience', icon:'✨', sub:'体験・経験',
-    ph:'例）海外体験\n天下山\n仲間と旅行...' },
+  { id:'be',         label:'Be',         icon:'🌱', sub:'あり方・能力',   color:'#4A7FBF', bg:'#EBF2FC', ph:'例）引き寄せ能力
+グランドセルフ
+愛される人格...' },
+  { id:'contribute', label:'Contribute', icon:'🌟', sub:'貢献・社会へ',   color:'#E8734A', bg:'#FDF0EA', ph:'例）ボランティア
+愛情コーチング
+パートナーシップコーチ...' },
+  { id:'haveget',    label:'Have / Get', icon:'💎', sub:'持つ・得る',     color:'#7B5EA7', bg:'#F1ECF9', ph:'例）中国語
+コミュニケーション能力
+女性性/男性性...' },
+  { id:'doenjoy',    label:'Do / Enjoy', icon:'🎯', sub:'行動・楽しむ',   color:'#C4891A', bg:'#FDF4E3', ph:'例）ホリスティック学習
+子どもと楽しむ
+旅行...' },
+  { id:'resource',   label:'Resource',   icon:'🔑', sub:'資源・源泉',     color:'#3A7D44', bg:'#EAF5EC', ph:'例）YOLO 一度きりの人生
+やりたい事がある
+仲間...' },
+  { id:'experience', label:'Experience', icon:'✨',    sub:'体験・経験',     color:'#C74B7B', bg:'#FCEAF3', ph:'例）海外体験
+天下山
+仲間と旅行...' },
 ];
 
 const INITIAL = { be:'', contribute:'', haveget:'', doenjoy:'', resource:'', experience:'', mission:'', affirmation:'', feeling:'', date:'' };
@@ -45,17 +51,13 @@ export default function CloverBoard({ user, onLogout }) {
     })();
   }, [user.uid]);
 
-  const showToast = msg => {
-    setToast(msg);
-    setTimeout(() => setToast(''), 2800);
-  };
+  const showToast = msg => { setToast(msg); setTimeout(() => setToast(''), 2800); };
 
   const handleSave = useCallback(async () => {
     setSaving(true);
     try {
       await setDoc(doc(db, 'clover', user.uid), { ...data, updatedAt: new Date().toISOString() });
-      setSaved(true);
-      showToast('✅ 保存しました');
+      setSaved(true); showToast('✅ 保存しました');
       setTimeout(() => setSaved(false), 2000);
     } catch(e) {
       console.error(e);
@@ -82,10 +84,8 @@ export default function CloverBoard({ user, onLogout }) {
         @media(max-width:600px){
           .clover-grid{grid-template-columns:1fr !important}
           .center-cols{grid-template-columns:1fr !important}
-          .header-right{flex-wrap:wrap}
         }
       `}</style>
-
       <header style={s.header}>
         <div style={s.headerLeft}>
           <span style={{fontSize:26}}>🍀</span>
@@ -94,57 +94,40 @@ export default function CloverBoard({ user, onLogout }) {
             <p style={s.titleSub}>引き寄せボード</p>
           </div>
         </div>
-        <div style={{...s.headerRight}} className="header-right">
+        <div style={s.headerRight}>
           <span style={s.userEmail}>{user.email}</span>
-          <button style={{...s.btnSave, opacity: saving?0.7:1}} onClick={handleSave} disabled={saving}>
+          <button style={{...s.btnSave, opacity:saving?0.7:1}} onClick={handleSave} disabled={saving}>
             {saving ? '保存中...' : saved ? '✓ 保存済み' : '💾 保存'}
           </button>
           <ExcelExport data={data} onToast={showToast} />
           <button style={s.btnLogout} onClick={onLogout}>ログアウト</button>
         </div>
       </header>
-
       <div style={s.container}>
         <div style={s.dateRow}>
           <label style={s.dateLabel}>記入日</label>
           <input style={s.dateInput} type="date" value={data.date||''} onChange={e=>set('date',e.target.value)} />
         </div>
-
         <div style={s.grid} className="clover-grid">
           <SectionCard sec={SECTIONS[0]} value={data.be} onChange={v=>set('be',v)} />
           <SectionCard sec={SECTIONS[1]} value={data.contribute} onChange={v=>set('contribute',v)} />
-
           <div style={s.centerBlock}>
             <div style={s.centerTitle}>🍀 中心のクローバー（核心）</div>
             <div style={s.centerGrid} className="center-cols">
-              <CenterField label="使命（Mission）" color="#1D5C8A" bg="#E8F1FB"
-                value={data.mission} onChange={v=>set('mission',v)}
-                ph={"あなたの人生の使命・目的を
-書いてください..."} />
-              <CenterField label="Affirmation（宣言）" color="#4A7FBF" bg="#EBF2FC"
-                value={data.affirmation} onChange={v=>set('affirmation',v)}
-                ph={"私は〜である。
-毎日声に出す宣言を
-書いてください..."} />
-              <CenterField label="Feeling（感情・感謝）" color="#3A7D44" bg="#EAF5EC"
-                value={data.feeling} onChange={v=>set('feeling',v)}
-                ph={"どんな感情で生きたい？
-感謝することを
-書いてください..."} />
+              <CenterField label="使命（Mission）" color="#1D5C8A" bg="#E8F1FB" value={data.mission} onChange={v=>set('mission',v)} ph="あなたの人生の使命・目的を書いてください..." />
+              <CenterField label="Affirmation（宣言）" color="#4A7FBF" bg="#EBF2FC" value={data.affirmation} onChange={v=>set('affirmation',v)} ph="私は～である。毎日声に出す宣言を書いてください..." />
+              <CenterField label="Feeling（感情・感謝）" color="#3A7D44" bg="#EAF5EC" value={data.feeling} onChange={v=>set('feeling',v)} ph="どんな感情で生きたい？感謝することを書いてください..." />
             </div>
           </div>
-
           <SectionCard sec={SECTIONS[2]} value={data.haveget} onChange={v=>set('haveget',v)} />
           <SectionCard sec={SECTIONS[3]} value={data.doenjoy} onChange={v=>set('doenjoy',v)} />
           <SectionCard sec={SECTIONS[4]} value={data.resource} onChange={v=>set('resource',v)} />
           <SectionCard sec={SECTIONS[5]} value={data.experience} onChange={v=>set('experience',v)} />
         </div>
-
         <div style={s.footer}>
           <p style={s.footerText}>Copyright © ドリームクローバー | Synergy Plus+</p>
         </div>
       </div>
-
       {toast && <div style={s.toast}>{toast}</div>}
     </div>
   );
@@ -152,8 +135,8 @@ export default function CloverBoard({ user, onLogout }) {
 
 function SectionCard({ sec, value, onChange }) {
   return (
-    <div style={{...s.card, borderTop:`4px solid ${sec.color}`, background: sec.bg}}>
-      <div style={{...s.cardLabel, color: sec.color}}>
+    <div style={{...s.card, borderTop:`4px solid ${sec.color}`, background:sec.bg}}>
+      <div style={{...s.cardLabel, color:sec.color}}>
         <span style={{fontSize:18}}>{sec.icon}</span>
         <span style={s.cardLabelText}>{sec.label}</span>
         <span style={s.cardLabelSub}>{sec.sub}</span>
@@ -167,8 +150,7 @@ function CenterField({ label, color, bg, value, onChange, ph }) {
   return (
     <div style={s.centerItem}>
       <label style={{...s.centerItemLabel, color}}>{label}</label>
-      <textarea style={{...s.textarea, background:bg, minHeight:90, border:'1.5px solid #ddd'}}
-        value={value} onChange={e=>onChange(e.target.value)} placeholder={ph} />
+      <textarea style={{...s.textarea, background:bg, minHeight:90, border:'1.5px solid #ddd'}} value={value} onChange={e=>onChange(e.target.value)} placeholder={ph} />
     </div>
   );
 }
@@ -181,7 +163,7 @@ const s = {
   headerLeft:{display:'flex',alignItems:'center',gap:'0.6rem'},
   title:{fontFamily:"'Zen Kaku Gothic New',sans-serif",fontSize:18,fontWeight:700,color:'#0F6E56',letterSpacing:1},
   titleSub:{fontSize:10,color:'#5DCAA5',letterSpacing:2},
-  headerRight:{display:'flex',alignItems:'center',gap:'0.5rem'},
+  headerRight:{display:'flex',alignItems:'center',gap:'0.5rem',flexWrap:'wrap'},
   userEmail:{fontSize:11,color:'#999',maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'},
   btnSave:{background:'#1D9E75',color:'#fff',border:'none',borderRadius:8,padding:'7px 14px',fontSize:13,fontWeight:700,fontFamily:"'Noto Sans JP',sans-serif",cursor:'pointer'},
   btnLogout:{background:'#f5f5f5',color:'#666',border:'1px solid #ddd',borderRadius:8,padding:'7px 12px',fontSize:12,fontFamily:"'Noto Sans JP',sans-serif",cursor:'pointer'},
